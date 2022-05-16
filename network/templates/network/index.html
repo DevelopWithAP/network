@@ -1,0 +1,78 @@
+{% extends "network/layout.html" %}
+
+{% block body %}
+<div class="container">
+    <!-- Button trigger modal -->
+    <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#newPostFormModal">
+        What's on your mind, {{ request.user.username }}?
+    </button>
+
+    <!-- Modal -->
+    <div class="modal fade" id="newPostFormModal" tabindex="-1" aria-labelledby="newPostFormModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Create post</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form action="{% url 'index' %}" method="POST">
+                    <div class="modal-body">
+                        {% csrf_token %}
+                        <textarea name="content" cols="45"
+                            placeholder="What's on your mind, {{ user.username }}?"></textarea>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary btn-block">Post</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <hr>
+    <h3>All posts</h3>
+    {% for post in page_obj %}
+    <div class="card my-2">
+        <div class="card-header">
+            <a href="{% url 'profile' post.author.id %}">{{ post.author }}</a>
+            <p><small>{{ post.created_on }}</small></p>
+        </div>
+        <div class="card-body">
+            <p class="card-text">{{ post.content }}</p>
+            {% if post.author.id == request.user.id %}
+            <span><i class="fas fa-edit"></i></span>
+            <span><i class="fas fa-eraser"></i></span>
+            {% endif %}
+            <div class="like px-1">
+                <span>{{ post.get_likes }}</span> <span>{{ post.get_users_liked }}</span>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+    <!-- Pagination section -->
+    <nav aria-label="Page navigation example">
+        <ul class="pagination">
+            {% if page_obj.has_previous %}
+            <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">&laquo;</a></li>
+            {% endif %}
+            {% for i in page_obj.paginator.page_range %}
+            {% if page_obj.number == i %}
+            <li class="page-item active" aria-current="page">
+                <span class="page-link">
+                    {{ i }}
+                    <span class="sr-only">(current)</span>
+                </span>
+            </li>
+            {% else %}
+            <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
+            {% endif %}
+            {% endfor %}
+            {% if page_obj.has_next %}
+            <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">&raquo;</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+    <!-- End of section -->
+</div>
+{% endblock %}

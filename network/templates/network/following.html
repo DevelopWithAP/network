@@ -1,0 +1,22 @@
+{% extends "network/layout.html" %}
+{% load static %}
+
+{% block title %} {{ user.username }} {% endblock title %}
+
+{% block body %}
+    <h3>Posts by people you follow, {{ user.username }}</h3>
+    {% for post in posts %}
+    <div class="card my-2">
+        <div class="card-header">
+            <a href="{% url 'profile' post.author.id %}">{{ post.author }}</a>
+            <p><small>{{ post.created_on }}</small></p>
+        </div>
+        <div class="card-body">
+            <p class="card-text">{{ post.content }}</p>
+            <div class="like px-1">
+                <span>{{ post.get_likes }}</span> <span>{{ post.get_users_liked }}</span>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+{% endblock body %}

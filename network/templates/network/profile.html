@@ -1,0 +1,56 @@
+{% extends "network/layout.html" %}
+{% load static %}
+
+{% block title %} {{ user.username }} {% endblock %}
+
+{% block body %}
+<div class="container">
+    <div class="text-center">
+        <h3>{{ user.username }}</h3>
+        Followers: <span id="followers">{{ followers }}</span>
+        <span>&bullet;</span>
+        Following: <span>{{ following }}</span>
+        <!-- Follow/Unfollow section -->
+        <div class="my-1">
+            {% if request.user.id != user.id %}
+            <button class="btn btn-outline-secondary btn-block" id="follow-btn" data-follower-id="{{ request.user.id }}"
+                data-user-id="{{ user.id }}">
+                {% if request.user not in user.get_followers %}
+                Follow
+                {% else %}
+                Following
+                {% endif %}
+            </button>
+            {% endif %}
+        </div>
+        <!-- End of section -->
+        <hr>
+        <!-- Posts section -->
+
+        {% for post in posts %}
+        <div class="card my-2">
+            <div class="card-header">
+                {{ post.author }}
+                <p><small>{{ post.created_on }}</small></p>
+            </div>
+            <div class="card-body">
+                <p class="card-text">{{ post.content }}</p>
+                {% if post.author.id == request.user.id %}
+                <span><i class="fas fa-edit"></i></span>
+                <span><i class="fas fa-eraser"></i></span>
+                {% endif %}
+                <div class="like px-1">
+                    <span>{{ post.get_likes }}</span> <span>{{ post.get_users_liked }}</span>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+        <!-- End of section -->
+    </div>
+
+</div>
+{% endblock %}
+
+{% block script %}
+<script src="{% static 'network/follow.js' %}"></script>
+{% endblock script %}
