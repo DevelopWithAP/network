@@ -12,18 +12,19 @@ from django.http import JsonResponse
 
 from .models import User, Post
 
+
 def index(request):
     posts = Post.objects.all().order_by("-created_on")
     page_number = request.GET.get("page", 1)
     paginator = Paginator(posts, 10)
-    
+
     try:
         page_obj = paginator.page(page_number)
     except PageNotAnInteger:
         page_obj = paginator.page(1)
     except EmptyPage:
         page_obj = paginator.page(paginator.num_pages)
-        
+
     if request.method == "POST":
         author = request.user
         content = request.POST["content"]
@@ -52,6 +53,7 @@ def login_view(request):
             })
     else:
         return render(request, "network/login.html")
+
 
 def logout_view(request):
     logout(request)
@@ -91,7 +93,7 @@ def profile(request, user_id):
     num_followers = user.count_followers()
     num_following = user.count_following()
 
-    posts = Post.objects.filter(author = user)
+    posts = Post.objects.filter(author=user)
     context = {
         "user": user,
         "followers": num_followers,
@@ -130,16 +132,33 @@ def follow(request):
             })
     return JsonResponse({"message": "Method not allowed"}, status=403)
 
+
 @login_required
 def following(request):
     if request.method == "GET":
         user = request.user
         following = user.get_following()
-        
+
         posts = Post.objects.filter(author__in=following)
-        
+
         context = {
             "posts": posts
         }
         return render(request, "network/following.html", context)
-    return Http404
+
+
+@login_required
+@csrf_exempt
+def edit(request, post_id):
+    if request.method == "PUT":
+        try:
+            post = Post.objects.get(pk=post_id)
+        except Post.DoesNotExist:
+            return JsonResponse({"error": f"Could not find post with id {post_id}"}, status=400)
+
+        data = json.loads(request.body)
+        if data.get("content") is not None:
+            post.content = data.get("content")
+            post.save()
+            return JsonResponse({"content": post.content})
+    return JsonResponse({"message": "Method no allowed"}, status=403)
