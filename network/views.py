@@ -1,7 +1,7 @@
 from django.contrib.auth import authenticate, login, logout
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db import IntegrityError
-from django.http import HttpResponseRedirect
+from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
@@ -12,8 +12,6 @@ from django.http import JsonResponse
 
 from .models import User, Post
 
-
-@login_required
 def index(request):
     posts = Post.objects.all().order_by("-created_on")
     page_number = request.GET.get("page", 1)
@@ -55,7 +53,6 @@ def login_view(request):
     else:
         return render(request, "network/login.html")
 
-@login_required
 def logout_view(request):
     logout(request)
     return HttpResponseRedirect(reverse("index"))
@@ -145,3 +142,4 @@ def following(request):
             "posts": posts
         }
         return render(request, "network/following.html", context)
+    return Http404
