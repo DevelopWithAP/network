@@ -30,6 +30,7 @@ class Post(models.Model):
     content = models.TextField()
     likes = models.ManyToManyField(User, blank=True)
     created_on = models.DateTimeField(default=timezone.now)
+    edited = models.BooleanField(default=False)
 
     # String representation of Post model
     def __str__(self):

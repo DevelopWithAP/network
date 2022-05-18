@@ -159,6 +159,12 @@ def edit(request, post_id):
         data = json.loads(request.body)
         if data.get("content") is not None:
             post.content = data.get("content")
+            post.edited = True
             post.save()
-            return JsonResponse({"content": post.content})
-    return JsonResponse({"message": "Method no allowed"}, status=403)
+
+            data = {
+                "content": post.content,
+                "edited": "true"
+            }
+            return JsonResponse(data, status=200)
+    return JsonResponse({"message": "Method not allowed"}, status=403)
