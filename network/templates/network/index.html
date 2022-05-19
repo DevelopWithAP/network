@@ -55,8 +55,19 @@
             </div>
         </div>
         <!-- End of edit div -->
-        <div class="like mx-3">
-            <span>{{ post.get_likes }}</span> <span>{{ post.get_users_liked }}</span>
+        <div class="mx-2">
+            <span class="like mx-2"> 
+                <i data-id="{{ post.id }}"
+                {% if request.user in post.likes.all %}
+                    class="fas fa-thumbs-up"
+                    data-action="unlike"
+                {% else %}
+                    class="far fa-thumbs-up"
+                    data-action="like"
+                {% endif %}
+                ></i>
+            </span>
+            <span id="likes-count-{{ post.id }}">{{ post.get_likes }}</span>
         </div>
     </div>
     {% endfor %}
@@ -90,4 +101,5 @@
 {% block script %}
     <script src="{% static 'network/index.js' %}"></script>
     <script src="{% static 'network/edit.js' %}"></script>
+    <script src="{% static 'network/like.js' %}"></script>
 {% endblock script %}

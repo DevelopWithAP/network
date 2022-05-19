@@ -1,3 +1,4 @@
+from shutil import register_unpack_format
 from django.contrib.auth import authenticate, login, logout
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db import IntegrityError
@@ -29,10 +30,11 @@ def index(request):
         author = request.user
         content = request.POST["content"]
         Post.objects.create(author=author, content=content)
-    context = {
-        "page_obj": page_obj,
-    }
-    return render(request, "network/index.html", context)
+        context = {
+            "page_obj": page_obj,
+        }
+        return render(request, "network/index.html", context)
+    return render(request, "network/index.html", {"page_obj": page_obj})
 
 
 def login_view(request):
@@ -168,3 +170,32 @@ def edit(request, post_id):
             }
             return JsonResponse(data, status=200)
     return JsonResponse({"message": "Method not allowed"}, status=403)
+
+
+@login_required
+@csrf_exempt
+def like(request, post_id):
+    try:
+        post = Post.objects.get(pk=post_id)
+    except Post.DoesNotExist:
+        return JsonResponse({"error": f"Could not find post with id {post_id}"}, status=400)
+    if request.method == "POST":
+        data = json.loads(request.body)
+       
+        if data.get("post_id") is not None and data.get("action") is not None:
+            if data.get("action") == "like":
+                post.likes.add(request.user)
+                post.save()
+                return JsonResponse({
+                    "action": "unlike",
+                    "likes": post.get_likes()
+                })
+            elif data.get("action") == "unlike":
+                post.likes.remove(request.user)
+                post.save()
+                return JsonResponse({
+                    "action": "like",
+                    "likes": post.get_likes()
+                })
+        return JsonResponse({"error": "Bad Request"}, status=400)        
+    return JsonResponse({"error": "Method not allowed"}, status=403)
