@@ -9,6 +9,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 import json
 from django.http import JsonResponse
+from pkg_resources import EmptyProvider
 
 
 from .models import User, Post
@@ -17,7 +18,7 @@ from .models import User, Post
 def index(request):
     posts = Post.objects.all().order_by("-created_on")
     page_number = request.GET.get("page", 1)
-    paginator = Paginator(posts, 10)
+    paginator = Paginator(posts, 5)
 
     try:
         page_obj = paginator.page(page_number)
@@ -96,11 +97,21 @@ def profile(request, user_id):
     num_following = user.count_following()
 
     posts = Post.objects.filter(author=user)
+    page_number = request.GET.get("page", 1)
+    paginator = Paginator(posts, 2)
+    
+    try:
+        page_obj = paginator.page(page_number)
+    except PageNotAnInteger:
+        page_obj = paginator.page(1)
+    except EmptyPage:
+        page_obj = paginator.page(paginator.num_pages)
+        
     context = {
         "user": user,
         "followers": num_followers,
         "following": num_following,
-        "posts": posts
+        "page_obj": page_obj
     }
     return render(request, "network/profile.html", context)
 

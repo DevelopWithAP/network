@@ -24,28 +24,68 @@
             {% endif %}
         </div>
         <!-- End of section -->
-        <hr>
-        <!-- Posts section -->
 
-        {% for post in posts %}
+        <hr>
+
+        <!-- Posts section -->
+        {% for post in page_obj %}
         <div class="card my-2">
             <div class="card-header">
                 {{ post.author }}
                 <p><small>{{ post.created_on }}</small></p>
             </div>
-            <div class="card-body">
-                <p class="card-text">{{ post.content }}</p>
+            <div class="card-body" data-parent-id="{{ post.id }}">
+                <p class="card-text" id="content-{{ post.id }}">{{ post.content }}</p>
                 {% if post.author.id == request.user.id %}
-                <span><i class="fas fa-edit"></i></span>
+                <span class="edit" data-post-id="{{ post.id }}"><i class="fas fa-edit"></i></span>
                 <span><i class="fas fa-eraser"></i></span>
                 {% endif %}
-                <div class="like px-1">
-                    <span>{{ post.get_likes }}</span> <span>{{ post.get_users_liked }}</span>
+            </div>
+            <!-- Edit section -->
+            <div class="edit-div" data-edit-id="{{ post.id }}" style="display: none;">
+                <textarea class="form-control" id="update-content-{{ post.id }}" name="update-content"></textarea>
+                <div class="btn-group mt-1">
+                    <span class="btn btn-sm btn-success mx-1" data-save-edit-id="{{ post.id }}"> <i
+                            class="far fa-check-circle"></i></span>
+                    <span class="btn btn-sm btn-danger mx-1" data-close-edit-id="{{ post.id }}"> <i
+                            class="far fa-times-circle"></i> </span>
                 </div>
             </div>
+            <!-- End of edit section -->
+
+            <!-- Like Section -->
+            <div class="like px-1">
+                <span>{{ post.get_likes }}</span>
+            </div>
+            <!-- End of like Section -->
         </div>
         {% endfor %}
         <!-- End of section -->
+        <!-- Pagination section -->
+        <nav aria-label="Page navigation example">
+            <ul class="pagination">
+                {% if page_obj.has_previous %}
+                <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">&laquo;</a>
+                </li>
+                {% endif %}
+                {% for i in page_obj.paginator.page_range %}
+                {% if page_obj.number == i %}
+                <li class="page-item active" aria-current="page">
+                    <span class="page-link">
+                        {{ i }}
+                        <span class="sr-only">(current)</span>
+                    </span>
+                </li>
+                {% else %}
+                <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
+                {% endif %}
+                {% endfor %}
+                {% if page_obj.has_next %}
+                <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">&raquo;</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+        <!-- End of pagination section -->
     </div>
 
 </div>
@@ -53,4 +93,6 @@
 
 {% block script %}
 <script src="{% static 'network/follow.js' %}"></script>
+<script src="{% static 'network/edit.js' %}"></script>
+<script src="{% static 'network/like.js' %}"></script>
 {% endblock script %}
