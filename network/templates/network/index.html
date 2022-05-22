@@ -34,6 +34,7 @@
     <hr>
     <h3>All posts</h3>
     {% for post in page_obj %}
+    {% if post.is_visible %}
     <div class="card my-2">
         <div class="card-header">
             <a href="{% url 'profile' post.author.id %}">{{ post.author }}</a>
@@ -42,38 +43,63 @@
         <div class="card-body" data-parent-id="{{ post.id }}">
             <p class="card-text" id="content-{{ post.id }}">{{ post.content }}</p>
             {% if post.author.id == request.user.id %}
-            <span class="edit" data-post-id="{{ post.id }}" data-bs-toggle="tooltip" data-bs-placement="left" title="Edit"><i class="fas fa-edit"></i></span>
-            <span class="delete" data-delete-id="{{ post.id }}" data-bs-toggle="tooltip" data-bs-placement="right" title="Delete"><i class="fas fa-eraser"></i></span>
+            <span class="edit" data-post-id="{{ post.id }}"><i class="fas fa-edit"></i></span>
+            <span data-bs-toggle="modal" data-bs-target="#deletePostModal-{{ post.id }}"><i
+                    class="fas fa-eraser"></i></span>
             {% endif %}
         </div>
-         <!-- Edit section -->
-         <div class="edit-div px-1 py-1" data-edit-id="{{ post.id }}" style="display: none;">
+
+        <!-- Delete post modal -->
+        <div class="modal fade" id="deletePostModal-{{ post.id }}" tabindex="-1" aria-labelledby="deletePostModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="deletePostModalLabel">Delete post {{ post.id }}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>
+                            Are you sure you wish to delete this post?
+                            <strong> This action is irreversable </strong>
+                        </p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No, I changed my
+                            mind!</button>
+                        <button type="submit" class="btn btn-danger delete" data-delete-id="{{ post.id }}"
+                            data-action="remove">Yes, I'm sure.</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- End of modal -->
+
+        <!-- Edit section -->
+        <div class="edit-div px-1 py-1" data-edit-id="{{ post.id }}" style="display: none;">
             <textarea class="form-control" id="update-content-{{ post.id }}" name="update-content"></textarea>
             <div class="btn-group mt-1">
-                <span class="btn btn-sm btn-success mx-1" data-save-edit-id="{{ post.id }}"> <i class="far fa-check-circle"></i></span>
-                <span class="btn btn-sm btn-danger mx-1" data-close-edit-id="{{ post.id }}"> <i class="far fa-times-circle"></i> </span>
+                <span class="btn btn-sm btn-success mx-1" data-save-edit-id="{{ post.id }}"> <i
+                        class="far fa-check-circle"></i></span>
+                <span class="btn btn-sm btn-danger mx-1" data-close-edit-id="{{ post.id }}"> <i
+                        class="far fa-times-circle"></i> </span>
             </div>
         </div>
         <!-- End of edit section -->
 
         <!-- Like section -->
         <div class="mx-2">
-            <span class="like mx-2"> 
-                <i data-id="{{ post.id }}"
-                {% if request.user in post.likes.all %}
-                    class="fas fa-thumbs-up"
-                    data-action="unlike"
-                {% else %}
-                    class="far fa-thumbs-up"
-                    data-action="like"
-                {% endif %}
-                ></i>
+            <span class="like mx-2">
+                <i data-id="{{ post.id }}" {% if request.user in post.likes.all %} class="fas fa-thumbs-up"
+                    data-action="unlike" {% else %} class="far fa-thumbs-up" data-action="like" {% endif %}></i>
 
             </span>
             <span id="likes-count-{{ post.id }}">{{ post.get_likes }}</span>
         </div>
         <!-- End of like section -->
     </div>
+    {% endif %}
     {% endfor %}
     <!-- Pagination section -->
     <nav aria-label="Page navigation example">
@@ -103,7 +129,8 @@
 {% endblock %}
 
 {% block script %}
-    <script src="{% static 'network/index.js' %}"></script>
-    <script src="{% static 'network/edit.js' %}"></script>
-    <script src="{% static 'network/like.js' %}"></script>
+<script src="{% static 'network/index.js' %}"></script>
+<script src="{% static 'network/edit.js' %}"></script>
+<script src="{% static 'network/like.js' %}"></script>
+<script src="{% static 'network/delete.js' %}"></script>
 {% endblock script %}

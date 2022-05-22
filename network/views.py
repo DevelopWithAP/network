@@ -1,15 +1,13 @@
-from shutil import register_unpack_format
 from django.contrib.auth import authenticate, login, logout
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db import IntegrityError
-from django.http import Http404, HttpResponseRedirect
-from django.shortcuts import render
+from django.http import HttpResponseRedirect
+from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 import json
 from django.http import JsonResponse
-from pkg_resources import EmptyProvider
 
 
 from .models import User, Post
@@ -99,14 +97,14 @@ def profile(request, user_id):
     posts = Post.objects.filter(author=user)
     page_number = request.GET.get("page", 1)
     paginator = Paginator(posts, 2)
-    
+
     try:
         page_obj = paginator.page(page_number)
     except PageNotAnInteger:
         page_obj = paginator.page(1)
     except EmptyPage:
         page_obj = paginator.page(paginator.num_pages)
-        
+
     context = {
         "user": user,
         "followers": num_followers,
@@ -192,7 +190,7 @@ def like(request, post_id):
         return JsonResponse({"error": f"Could not find post with id {post_id}"}, status=400)
     if request.method == "POST":
         data = json.loads(request.body)
-       
+
         if data.get("post_id") is not None and data.get("action") is not None:
             if data.get("action") == "like":
                 post.likes.add(request.user)
@@ -208,11 +206,26 @@ def like(request, post_id):
                     "action": "like",
                     "likes": post.get_likes()
                 })
-        return JsonResponse({"error": "Bad Request"}, status=400)        
+        return JsonResponse({"error": "Bad Request"}, status=400)
     return JsonResponse({"error": "Method not allowed"}, status=403)
+
+
 @csrf_exempt
 @login_required
-def delete(request, post_id):
-    if request.method == "PUT":
-        pass
+def toggle_visibility(request, post_id):
+    try:
+        post = Post.objects.get(pk=post_id)
+    except Post.DoesNotExist:
+        return JsonResponse({"error": f"Cound not find post with id {post_id}"})
+    if request.method == "POST":
+        data = json.loads(request.body)
+        post_id = int(data["post_id"])
+        post = Post.objects.get(pk=post_id)
+        print(data)
+        if data.get("post_id") is not None:
+            if data.get("action") == "remove":
+                post.is_visible = False
+                post.save()
+                return JsonResponse({"message": f"Post {post_id} no longer visible"}, status=200)
+        return JsonResponse({"error": "Bad request"}, status=400)
     return JsonResponse({"error": "Method not allowed"}, status=403)
