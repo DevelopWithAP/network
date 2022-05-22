@@ -210,3 +210,9 @@ def like(request, post_id):
                 })
         return JsonResponse({"error": "Bad Request"}, status=400)        
     return JsonResponse({"error": "Method not allowed"}, status=403)
+@csrf_exempt
+@login_required
+def delete(request, post_id):
+    if request.method == "PUT":
+        pass
+    return JsonResponse({"error": "Method not allowed"}, status=403)

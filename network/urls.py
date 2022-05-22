@@ -1,5 +1,5 @@
 
-from django.urls import path
+from django.urls import path, re_path
 
 from . import views
 
@@ -14,5 +14,6 @@ urlpatterns = [
     path("follow/", views.follow),
     path("edit/<int:post_id>", views.edit),
     path("like/<int:post_id>", views.like),
+    path("delete/<int:post_id>", views.delete, name="delete"),
     
 ]

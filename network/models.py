@@ -30,7 +30,7 @@ class Post(models.Model):
     content = models.TextField()
     likes = models.ManyToManyField(User, blank=True)
     created_on = models.DateTimeField(default=timezone.now)
-    edited = models.BooleanField(default=False)
+    is_visible = models.BooleanField(default=True)
 
     # String representation of Post model
     def __str__(self):
@@ -45,22 +45,3 @@ class Post(models.Model):
         qs = self.likes.all()
         return ", ".join([user.username for user in qs])
 
-
-class Profile(models.Model):
-    """ Stores profile information for the user """
-    user = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name="owner")
-    following = models.ManyToManyField(User, blank=True)
-
-    # String representation of Profile model
-    def __str__(self):
-        """ Return the owner of the porfile """
-        return str(self.user.username)
-
-    # Returns the number of user the owner is following
-    def count_following(self):
-        return self.following.all().count()
-
-    # Returns the users the owner os following
-    def get_following(self):
-        return self.following.all()
