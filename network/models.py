@@ -31,6 +31,10 @@ class Post(models.Model):
     likes = models.ManyToManyField(User, blank=True)
     created_on = models.DateTimeField(default=timezone.now)
     is_visible = models.BooleanField(default=True)
+    
+    
+    class Meta:
+        ordering = ["-id"]
 
     # String representation of Post model
     def __str__(self):

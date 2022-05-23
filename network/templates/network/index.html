@@ -3,12 +3,12 @@
 
 {% block body %}
 <div class="container">
-    <!-- Button trigger modal -->
+    <!-- Button trigger new post modal -->
     <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#newPostFormModal">
         What's on your mind, {{ request.user.username }}?
     </button>
 
-    <!-- Modal -->
+    <!--  new post modal -->
     <div class="modal fade" id="newPostFormModal" tabindex="-1" aria-labelledby="newPostFormModalLabel"
         aria-hidden="true">
         <div class="modal-dialog">
@@ -30,6 +30,8 @@
             </div>
         </div>
     </div>
+
+    <!-- End of new post modal -->
 
     <hr>
     <h3>All posts</h3>

@@ -1,3 +1,5 @@
+from email.utils import collapse_rfc2231_value
+from telnetlib import STATUS
 from django.contrib.auth import authenticate, login, logout
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db import IntegrityError
@@ -170,16 +172,30 @@ def edit(request, post_id):
         data = json.loads(request.body)
         if data.get("content") is not None:
             post.content = data.get("content")
-            post.edited = True
             post.save()
 
-            data = {
-                "content": post.content,
-                "edited": "true"
-            }
+            data = { "content": post.content }
             return JsonResponse(data, status=200)
     return JsonResponse({"message": "Method not allowed"}, status=403)
 
+@login_required
+@csrf_exempt
+def edit_from_profile(request, user_id, post_id):
+    if request.method == "PUT":
+        try: 
+            user_id = request.user.id
+            post = Post.objects.get(pk=post_id)
+        except User.DoesNotExist:
+            return JsonResponse({"error": f"Could not find user with id {user_id}"}, status=400)
+        
+        data = json.loads(request.body)
+        if data.get("content") is not None:
+            post.content = data.get("content")
+            post.save()
+            
+            data = { "content": post.content }
+            return JsonResponse(data, status=200)
+    return JsonResponse({"message": "Method not allowed"}, status=403)
 
 @login_required
 @csrf_exempt

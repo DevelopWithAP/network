@@ -1,5 +1,7 @@
 /**
- * Handles the deletion of a post
+ * Handles the deletion of a post.
+ * Deleting in this case means making the post content invisible
+ * to users.
  */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -18,10 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 })
             })
                 .then((response) => response.json())
-                .then((result) => {
-                    console.log(result);
-                    location.reload();
-                });
+                .then(() => location.reload());
         };
     });
 

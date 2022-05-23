@@ -4,8 +4,9 @@
 {% block title %} {{ user.username }} {% endblock %}
 
 {% block body %}
+{% if user.is_authenticated %}
 <div class="container">
-    <div class="text-center">
+    <div>
         <h3>{{ user.username }}</h3>
         Followers: <span id="followers">{{ followers }}</span>
         <span>&bullet;</span>
@@ -36,13 +37,10 @@
             </div>
             <div class="card-body" data-parent-id="{{ post.id }}">
                 <p class="card-text" id="content-{{ post.id }}">{{ post.content }}</p>
-                {% if post.author.id == request.user.id %}
-                <span class="edit" data-post-id="{{ post.id }}"><i class="fas fa-edit"></i></span>
-                <span><i class="fas fa-eraser"></i></span>
-                {% endif %}
+                <span class="edit" data-post-id="{{ post.id }}" data-user-id="{{ request.user.id }}"><i class="fas fa-edit"></i></span>
             </div>
             <!-- Edit section -->
-            <div class="edit-div px-1 py-1" data-edit-id="{{ post.id }}" style="display: none;">
+            <div class="edit-div px-1 py-1" data-edit-id="{{ post.id }}"  data-edit-user-id="{{ post.author.id }}" style="display: none;">
                 <textarea class="form-control" id="update-content-{{ post.id }}" name="update-content"></textarea>
                 <div class="btn-group mt-1">
                     <span class="btn btn-sm btn-success mx-1" data-save-edit-id="{{ post.id }}"> <i
@@ -54,8 +52,10 @@
             <!-- End of edit section -->
 
             <!-- Like Section -->
-            <div class="like px-1">
-                <span>{{ post.get_likes }}</span>
+            <div class="mx-2">
+                <div class="like mx-2">
+                    <span>{{ post.get_likes }}</span>
+                </div>
             </div>
             <!-- End of like Section -->
         </div>
@@ -89,10 +89,11 @@
     </div>
 
 </div>
+{% endif %}
 {% endblock %}
 
 {% block script %}
 <script src="{% static 'network/follow.js' %}"></script>
-<script src="{% static 'network/edit.js' %}"></script>
+<script src="{% static 'network/editFromProfilePage.js' %}"></script>
 <script src="{% static 'network/like.js' %}"></script>
 {% endblock script %}

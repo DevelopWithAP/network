@@ -1,5 +1,5 @@
 
-from django.urls import path, re_path
+from django.urls import path
 
 from . import views
 
@@ -13,6 +13,7 @@ urlpatterns = [
     # API route
     path("follow/", views.follow),
     path("edit/<int:post_id>", views.edit),
+    path("<int:user_id>/edit/<int:post_id>", views.edit_from_profile),
     path("like/<int:post_id>", views.like),
     path("toggle_visibility/<int:post_id>", views.toggle_visibility),
     
