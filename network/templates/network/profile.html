@@ -37,10 +37,14 @@
             </div>
             <div class="card-body" data-parent-id="{{ post.id }}">
                 <p class="card-text" id="content-{{ post.id }}">{{ post.content }}</p>
-                <span class="edit" data-post-id="{{ post.id }}" data-user-id="{{ request.user.id }}"><i class="fas fa-edit"></i></span>
+                {% if request.user.id == post.author.id %}
+                <span class="edit" data-post-id="{{ post.id }}" data-user-id="{{ request.user.id }}"><i
+                        class="fas fa-edit"></i></span>
+                {% endif %}
             </div>
             <!-- Edit section -->
-            <div class="edit-div px-1 py-1" data-edit-id="{{ post.id }}"  data-edit-user-id="{{ post.author.id }}" style="display: none;">
+            <div class="edit-div px-1 py-1" data-edit-id="{{ post.id }}" data-edit-user-id="{{ post.author.id }}"
+                style="display: none;">
                 <textarea class="form-control" id="update-content-{{ post.id }}" name="update-content"></textarea>
                 <div class="btn-group mt-1">
                     <span class="btn btn-sm btn-success mx-1" data-save-edit-id="{{ post.id }}"> <i

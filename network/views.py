@@ -1,10 +1,8 @@
-from email.utils import collapse_rfc2231_value
-from telnetlib import STATUS
 from django.contrib.auth import authenticate, login, logout
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db import IntegrityError
 from django.http import HttpResponseRedirect
-from django.shortcuts import render, redirect
+from django.shortcuts import render
 from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
@@ -18,7 +16,7 @@ from .models import User, Post
 def index(request):
     posts = Post.objects.all().order_by("-created_on")
     page_number = request.GET.get("page", 1)
-    paginator = Paginator(posts, 5)
+    paginator = Paginator(posts, 10)
 
     try:
         page_obj = paginator.page(page_number)
@@ -237,7 +235,6 @@ def toggle_visibility(request, post_id):
         data = json.loads(request.body)
         post_id = int(data["post_id"])
         post = Post.objects.get(pk=post_id)
-        print(data)
         if data.get("post_id") is not None:
             if data.get("action") == "remove":
                 post.is_visible = False

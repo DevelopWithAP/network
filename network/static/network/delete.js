@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 })
             })
                 .then((response) => response.json())
-                .then(() => location.reload());
+                .then(() => document.location.replace('/'));
         };
     });
 
